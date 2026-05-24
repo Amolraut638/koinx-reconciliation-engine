@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      target: production
+    container_name: reconciliation-engine
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongo:27017/reconciliation-engine
+      - TIMESTAMP_TOLERANCE_SECONDS=300
+      - QUANTITY_TOLERANCE_PCT=0.0001
+      - CONFLICT_WINDOW_SECONDS=86400
+      - CONFLICT_WINDOW_QTY_PCT=0.5
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: reconciliation-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
