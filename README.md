@@ -99,7 +99,7 @@ src/
 
 ```bash
 # 1. Clone
-git clone <repo-url>
+git clone https://github.com/Amolraut638/koinx-reconciliation-engine.git
 cd reconciliation-engine
 
 # 2. Install
